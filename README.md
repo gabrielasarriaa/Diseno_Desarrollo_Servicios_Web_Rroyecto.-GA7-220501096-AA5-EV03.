@@ -45,6 +45,34 @@ Si el usuario o la contraseña no coinciden con lo guardado en
 `src/data/usuarios.json`, el formulario mostrará el mensaje de error que
 devuelve el servicio (`"Error en la autenticacion: ..."`).
 
+## Servicio de Georreferenciación (nuevo)
+
+Además del login, el proyecto ahora incluye un segundo servicio web:
+
+- **`GET /api/geocodificar?direccion=...`** — convierte una dirección de
+  texto en coordenadas (latitud/longitud), usando **Nominatim**
+  (OpenStreetMap), un servicio público y gratuito que no requiere API key.
+
+En el panel de **Órdenes de Trabajo**, cada fila tiene un botón 📍 que
+llama a este servicio con la dirección registrada en la orden y abre el
+resultado en un mapa de OpenStreetMap en una pestaña nueva.
+
+```bash
+curl "http://localhost:3000/api/geocodificar?direccion=Calle%2010%20%2312-45%20Bogota"
+```
+
+Respuesta esperada:
+```json
+{
+  "exito": true,
+  "resultado": {
+    "lat": 4.598,
+    "lon": -74.076,
+    "direccionEncontrada": "Calle 10 ..., Bogotá, Colombia"
+  }
+}
+```
+
 ## Cómo registrar un nuevo usuario
 
 Por ahora el sitio no tiene un formulario visual de registro (esa evidencia
