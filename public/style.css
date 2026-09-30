@@ -431,6 +431,10 @@ body {
 .btn-invoice-table:disabled {
   background-color: #cbd5e1; cursor: not-allowed;
 }
+.btn-geo-table {
+  background-color: #f97316; color: white; border: none;
+  padding: 4px 8px; border-radius: 4px; cursor: pointer; margin-right: 4px;
+}
 
 /* --- MODAL FLOTANTE --- */
 .modal-overlay {

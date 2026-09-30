@@ -452,6 +452,7 @@ function renderTabla(modulo) {
       tdAcciones.innerHTML = `
         <button class="btn-state-table" title="Avanzar estado" onclick="cambiarEstadoOrden(${reg.id})">🔄</button>
         <button class="btn-invoice-table" title="Generar factura" ${puedeFacturar ? '' : 'disabled'} onclick="generarFacturaOrden(${reg.id})">🧾</button>
+        <button class="btn-geo-table" title="Ver ubicación en el mapa" onclick="verUbicacionOrden(${reg.id})">📍</button>
         <button class="btn-edit-table" onclick="abrirModalCrud('${modulo}', ${reg.id})">✏️</button>
         <button class="btn-delete-table" onclick="eliminarRegistroCrud('${modulo}', ${reg.id})">🗑️</button>
       `;
@@ -522,6 +523,40 @@ function calcularCostoOrden(tipoServicio) {
     'Web': 400000
   };
   return tarifasBase[tipoServicio] || 150000; // Tarifa mínima por defecto
+}
+
+/**
+ * Consulta el servicio web de georreferenciacion (GET /api/geocodificar)
+ * para ubicar en el mapa la direccion registrada en una orden de trabajo,
+ * y abre el resultado en OpenStreetMap en una pestaña nueva.
+ * Traza al campo "Ruta / Dirección" de la clase OrdenTrabajo.
+ *
+ * @param {number} idTarget Id de la orden de trabajo a ubicar.
+ */
+async function verUbicacionOrden(idTarget) {
+  const orden = datosCrud.servicios.find(item => item.id === idTarget);
+  if (!orden) return;
+
+  const direccion = orden.valores[camposPorModulo.servicios.indexOf('Ruta / Dirección')];
+
+  try {
+    const respuesta = await fetch(`/api/geocodificar?direccion=${encodeURIComponent(direccion)}`);
+    const data = await respuesta.json();
+
+    if (!respuesta.ok || !data.exito) {
+      alert(data.mensaje || 'No se pudo ubicar esa dirección en el mapa.');
+      return;
+    }
+
+    const { lat, lon, direccionEncontrada } = data.resultado;
+    const urlMapa = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=17/${lat}/${lon}`;
+
+    // Se abre el mapa en una pestaña nueva con la ubicación encontrada.
+    window.open(urlMapa, '_blank');
+    console.log(`Orden #${orden.id}: ubicación encontrada — ${direccionEncontrada} (${lat}, ${lon})`);
+  } catch (error) {
+    alert('No se pudo conectar con el servicio de georreferenciación.');
+  }
 }
 
 /**
