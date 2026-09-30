@@ -13,6 +13,7 @@
 const express = require('express');
 const path = require('path');
 const authRoutes = require('./src/routes/auth.routes');
+const geoRoutes = require('./src/routes/geo.routes');
 
 const app = express();
 const PUERTO = process.env.PORT || 3000;
@@ -26,6 +27,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Endpoints del servicio de autenticacion: /api/registro y /api/login
 app.use('/api', authRoutes);
+
+// Endpoints del servicio de georreferenciacion: /api/geocodificar
+app.use('/api', geoRoutes);
 
 // Manejador de rutas de API no encontradas (404)
 app.use('/api', (req, res) => {
